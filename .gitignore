@@ -1,0 +1,80 @@
+# == Java & Maven / Gradle ==
+# Compiled Java class files
+*.class
+
+# Maven build output
+/target/
+/build/
+
+# Gradle build output
+.gradle/
+build/
+
+# Ignore Maven wrapper JAR if needed
+!/.mvn/wrapper/maven-wrapper.jar
+
+# Eclipse / STS
+.metadata/
+*.tmp
+*.bak
+*.swp
+*.overlay
+*.log
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# VS Code
+.vscode/
+
+# == OS Files ==
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Linux
+*.swp
+*~
+
+# == Logs / Reports ==
+*.log
+test-output/
+reports/
+allure-results/
+*.html
+*.xml
+
+# == Dependency / Tools folders ==
+/node_modules/
+
+# == Environment & config ==
+.env
+*.env
+
+# == Other build artifacts ==
+*.jar
+*.war
+*.ear
+
+# == Eclipse specific ==
+.classpath
+.project
+.settings/
+
+# == Optional: ignore webdriver binaries ==
+/drivers/
+chromedriver*
+geckodriver*
+
+# == Ignore IntelliJ Project files ==
+out/
+
+# == Cucumber / BDD ==
+*.feature~
+
+# == Local test databases ***
+*.db
