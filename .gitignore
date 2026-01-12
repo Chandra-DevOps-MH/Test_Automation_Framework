@@ -46,7 +46,7 @@ test-output/
 reports/
 allure-results/
 *.html
-*.xml
+
 
 # == Dependency / Tools folders ==
 /node_modules/
