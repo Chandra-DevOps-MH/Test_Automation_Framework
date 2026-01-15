@@ -96,17 +96,21 @@ public class BaseClass {
 			options.addArguments("--disable-notifications"); //Disable browser notification
 			options.addArguments("--no-sandbox"); //Required in some Linux enviroments
 			options.addArguments("--disable-dev-shm-usage"); //Resolve issue in resources
-			
+			options.addArguments("--disable-extensions");
+			options.addArguments("--incognito");
 			
 			
 			//driver = new ChromeDriver();
-			driver.set(new ChromeDriver(options)); //New changes as per thread
+			driver.set(new ChromeDriver()); //New changes as per thread
 			
 			Map<String, Object> metrics = new HashMap<>();
 			metrics.put("width", 1920);
 			metrics.put("height", 1080);
 			metrics.put("deviceScaleFactor", 1);
 			metrics.put("mobile", false);
+			metrics.put("credentials_enable_service", false);
+			metrics.put("profile.password_manager_enabled", false);
+			metrics.put("profile.password_manager_leak_detection", false);
 
 			((ChromiumDriver) BaseClass.getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
 			
