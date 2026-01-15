@@ -101,7 +101,7 @@ public class BaseClass {
 			
 			
 			//driver = new ChromeDriver();
-			driver.set(new ChromeDriver()); //New changes as per thread
+			driver.set(new ChromeDriver(options)); //New changes as per thread
 			
 			Map<String, Object> metrics = new HashMap<>();
 			metrics.put("width", 1920);
