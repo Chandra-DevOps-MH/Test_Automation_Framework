@@ -6,7 +6,7 @@
 <test name = "OrangeHRMTest">
 <classes>
 		
-		<class name = "com.orangehrm.test.APITest"></class>
+		<class name = "com.orangehrm.test.DummyTest2"></class>
 </classes>
 </test>
 </suite>
