@@ -45,7 +45,7 @@ Thumbs.db
 test-output/
 reports/
 allure-results/
-*.html
+
 
 
 # == Dependency / Tools folders ==
