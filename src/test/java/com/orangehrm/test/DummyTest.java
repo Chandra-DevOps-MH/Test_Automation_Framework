@@ -11,6 +11,7 @@ public class DummyTest extends BaseClass{
 	@Test
 	public void dummyTest() {
 		
+			//Some changes to check jenkins build auto run when we push code
 		    ExtendManager.startTest("Start the dummyTest"); //-- This has been implemented in Testlistener class
 			String Title = getDriver().getTitle();
 			ExtendManager.logStep("Verifying the OrangeHRM title");
