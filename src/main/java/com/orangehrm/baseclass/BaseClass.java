@@ -2,6 +2,8 @@ package com.orangehrm.baseclass;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,11 +23,14 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Parameters;
 import org.testng.asserts.SoftAssert;
 
+import com.beust.jcommander.Parameter;
 import com.orangehrm.actiondriver.ActionDriver;
 import com.orangehrm.utilities.ExtendManager;
 import com.orangehrm.utilities.LoggerManager;
@@ -63,9 +68,10 @@ public class BaseClass {
 	}
 
 	@BeforeMethod
-	public synchronized void setUp() throws IOException {
+	@Parameters("browser")
+	public synchronized void setUp(String browser) throws IOException {
 		System.out.println("Setting up WebDriver for :" + this.getClass().getSimpleName());
-		launchBrowser();
+		launchBrowser(browser);
 		configureBrowser();
 		staticWait(2);
 		logger.info("WebDriver initialized and Browser maximized");
@@ -82,10 +88,52 @@ public class BaseClass {
 	}
 
 	// Initialize the WebDriver based on browser defined in config.properties file
-	private synchronized void launchBrowser() {
+	private synchronized void launchBrowser(String browser) {
 
-		String browser = prop.getProperty("browser");
+		//String browser = prop.getProperty("browser");
+		
+		boolean seleniumGrid = Boolean.parseBoolean(prop.getProperty("seleniumGrid"));
+		String getURL = prop.getProperty("gridURL");
+	
+		if(seleniumGrid)
+		{
+			try {
+				
+			   if(browser.equalsIgnoreCase("chrome"))
+			   {
+				    ChromeOptions options = new ChromeOptions(); 
+				   options.setPlatformName("WINDOWS");
+					options.addArguments("--headless"); //Run Chrome in headless mode
+					
+					driver.set(new RemoteWebDriver(new URL(getURL), options));
+			   }else if(browser.equalsIgnoreCase("firefox"))
+			   {
+				   FirefoxOptions options = new FirefoxOptions(); 
+				   options.setPlatformName("WINDOWS");
+				   options.addArguments("--headless"); //Run Firefox in headless mode
+				   
+				   driver.set(new RemoteWebDriver(new URL(getURL), options));
+			   }else if(browser.equalsIgnoreCase("edge"))
+			   {
+				   EdgeOptions options = new EdgeOptions(); 
+				   options.setPlatformName("WINDOWS");
+				   options.addArguments("--headless"); //Run Edge in headless mode
+				   
+				   driver.set(new RemoteWebDriver(new URL(getURL), options));
 
+			   }else
+			   {
+				   throw new IllegalArgumentException("Browser not supported: " +browser);
+			   }
+			   logger.info("Remote webdriver created for grid in headless mode");
+			}catch(MalformedURLException e)
+			{
+				throw new RuntimeException("invalid grid URL", e);
+			}
+		}
+		
+		
+		
 		if (browser.equalsIgnoreCase("chrome")) {
 			
 			//create ChromeOptions
