@@ -89,185 +89,84 @@ public class BaseClass {
 
 	// Initialize the WebDriver based on browser defined in config.properties file
 	private synchronized void launchBrowser(String browser) {
+	    boolean seleniumGrid = Boolean.parseBoolean(prop.getProperty("seleniumGrid"));
+	    String getURL = prop.getProperty("gridURL");
 
-		//String browser = prop.getProperty("browser");
-		
-		boolean seleniumGrid = Boolean.parseBoolean(prop.getProperty("seleniumGrid"));
-		String getURL = prop.getProperty("gridURL");
-	
-		if(seleniumGrid)
-		{
-			try {
-				
-			   if(browser.equalsIgnoreCase("chrome"))
-			   {
-				    ChromeOptions options = new ChromeOptions(); 
-				   //options.setPlatformName("WINDOWS");
-					options.addArguments("--headless"); //Run Chrome in headless mode
-					options.addArguments("--disable-gpu"); //Disable GPU for headless mode
-					options.addArguments("--window-size=1920,1080"); //Set window size
-					options.addArguments("--disable-notifications"); //Disable browser notification
-					options.addArguments("--no-sandbox"); //Required in some Linux enviroments
-					options.addArguments("--disable-dev-shm-usage"); //Resolve issue in resources
-					options.addArguments("--disable-extensions");
-					options.addArguments("--incognito");
-					
-					
-					driver.set(new RemoteWebDriver(new URL(getURL), options));
-					
-					Map<String, Object> metrics = new HashMap<>();
-					metrics.put("width", 1920);
-					metrics.put("height", 1080);
-					metrics.put("deviceScaleFactor", 1);
-					metrics.put("mobile", false);
-					metrics.put("credentials_enable_service", false);
-					metrics.put("profile.password_manager_enabled", false);
-					metrics.put("profile.password_manager_leak_detection", false);
+	    try {
+	        if (seleniumGrid) {
+	            // ---------- Selenium Grid ----------
+	            if (browser.equalsIgnoreCase("chrome")) {
+	                ChromeOptions options = new ChromeOptions();
+	                options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080",
+	                        "--disable-notifications", "--no-sandbox", "--disable-dev-shm-usage", "--incognito");
+	                driver.set(new RemoteWebDriver(new URL(getURL), options));
 
-					((ChromiumDriver) BaseClass.getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
+	            } else if (browser.equalsIgnoreCase("firefox")) {
+	                FirefoxOptions options = new FirefoxOptions();
+	                options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080",
+	                        "--disable-notifications", "--no-sandbox", "--disable-dev-shm-usage");
+	                driver.set(new RemoteWebDriver(new URL(getURL), options));
 
-			   }else if(browser.equalsIgnoreCase("firefox"))
-			   {
-				   FirefoxOptions options = new FirefoxOptions(); 
-				  // options.setPlatformName("WINDOWS");
-				   options.addArguments("--headless"); //Run Firefox in headless mode
-				   options.addArguments("--disable-gpu"); //Disable GPU for headless mode
-					options.addArguments("--window-size=1920,1080"); //Set window size
-					options.addArguments("--disable-notifications"); //Disable browser notification
-					options.addArguments("--no-sandbox"); //Required in some Linux enviroments
-					options.addArguments("--disable-dev-shm-usage"); //Resolve issue in resources
-					
-				   
-				   driver.set(new RemoteWebDriver(new URL(getURL), options));
-				   
-				   Map<String, Object> metrics = new HashMap<>();
-					metrics.put("width", 1920);
-					metrics.put("height", 1080);
-					metrics.put("deviceScaleFactor", 1);
-					metrics.put("mobile", false);
+	            } else if (browser.equalsIgnoreCase("edge")) {
+	                EdgeOptions options = new EdgeOptions();
+	                options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080",
+	                        "--disable-notifications", "--no-sandbox", "--disable-dev-shm-usage");
+	                driver.set(new RemoteWebDriver(new URL(getURL), options));
 
-					((ChromiumDriver) BaseClass.getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
+	            } else {
+	                throw new IllegalArgumentException("Browser not supported for Grid: " + browser);
+	            }
+	            logger.info("Remote WebDriver created for Grid in headless mode");
 
-				   
-			   }else if(browser.equalsIgnoreCase("edge"))
-			   {
-				   EdgeOptions options = new EdgeOptions(); 
-				  // options.setPlatformName("WINDOWS");
-				   options.addArguments("--headless"); //Run Edge in headless mode
-				   options.addArguments("--disable-gpu"); //Disable GPU for headless mode
-					options.addArguments("--window-size=1920,1080"); //Set window size
-					options.addArguments("--disable-notifications"); //Disable browser notification
-					options.addArguments("--no-sandbox"); //Required in some Linux enviroments
-					options.addArguments("--disable-dev-shm-usage"); //Resolve issue in resources
-					
-				   
-				   driver.set(new RemoteWebDriver(new URL(getURL), options));
-				   
-				   Map<String, Object> metrics = new HashMap<>();
-					metrics.put("width", 1920);
-					metrics.put("height", 1080);
-					metrics.put("deviceScaleFactor", 1);
-					metrics.put("mobile", false);
+	        } else {
+	            // ---------- Local Browser ----------
+	            if (browser.equalsIgnoreCase("chrome")) {
+	                ChromeOptions options = new ChromeOptions();
+	                options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080",
+	                        "--disable-notifications", "--no-sandbox", "--disable-dev-shm-usage", "--incognito");
+	                driver.set(new ChromeDriver(options));
 
-					((ChromiumDriver) BaseClass.getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
+	            } else if (browser.equalsIgnoreCase("firefox")) {
+	                FirefoxOptions options = new FirefoxOptions();
+	                options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080",
+	                        "--disable-notifications", "--no-sandbox", "--disable-dev-shm-usage");
+	                driver.set(new FirefoxDriver(options));
 
+	            } else if (browser.equalsIgnoreCase("edge")) {
+	                EdgeOptions options = new EdgeOptions();
+	                options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080",
+	                        "--disable-notifications", "--no-sandbox", "--disable-dev-shm-usage");
+	                driver.set(new EdgeDriver(options));
 
-			   }else
-			   {
-				   throw new IllegalArgumentException("Browser not supported: " +browser);
-			   }
-			   logger.info("Remote webdriver created for grid in headless mode");
-			}catch(MalformedURLException e)
-			{
-				throw new RuntimeException("invalid grid URL", e);
-			}
-		}
-		
-		
-		
-		else if(browser.equalsIgnoreCase("chrome")) {
-			
-			//create ChromeOptions
-			ChromeOptions options = new ChromeOptions(); 
-			options.addArguments("--headless"); //Run Chrome in headless mode
-			options.addArguments("--disable-gpu"); //Disable GPU for headless mode
-			options.addArguments("--window-size=1920,1080"); //Set window size
-			options.addArguments("--disable-notifications"); //Disable browser notification
-			options.addArguments("--no-sandbox"); //Required in some Linux enviroments
-			options.addArguments("--disable-dev-shm-usage"); //Resolve issue in resources
-			options.addArguments("--disable-extensions");
-			options.addArguments("--incognito");
-			
-			
-			//driver = new ChromeDriver();
-			driver.set(new ChromeDriver(options)); //New changes as per thread
-			
-			Map<String, Object> metrics = new HashMap<>();
-			metrics.put("width", 1920);
-			metrics.put("height", 1080);
-			metrics.put("deviceScaleFactor", 1);
-			metrics.put("mobile", false);
-			metrics.put("credentials_enable_service", false);
-			metrics.put("profile.password_manager_enabled", false);
-			metrics.put("profile.password_manager_leak_detection", false);
+	            } else {
+	                throw new IllegalArgumentException("Browser not supported locally: " + browser);
+	            }
+	            logger.info("Local WebDriver instance created");
+	        }
 
-			((ChromiumDriver) BaseClass.getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
-			
-			ExtendManager.registerDriver(getDriver());
-			logger.info("Chrome driver instance is created");
-		} else if (browser.equalsIgnoreCase("firefox")) {
-			
-			//create FireFoxOptions
-			FirefoxOptions options = new FirefoxOptions(); 
-			options.addArguments("--headless"); //Run Firefox in headless mode
-			options.addArguments("--disable-gpu"); //Disable GPU for headless mode
-			options.addArguments("--window-size=1920,1080"); //Set window size
-			options.addArguments("--disable-notifications"); //Disable browser notification
-			options.addArguments("--no-sandbox"); //Required in some Linux enviroments
-			options.addArguments("--disable-dev-shm-usage"); //Resolve issue in resources
-			
-			//driver = new FirefoxDriver();
-			driver.set(new FirefoxDriver(options));  //New changes as per thread
-			
-			Map<String, Object> metrics = new HashMap<>();
-			metrics.put("width", 1920);
-			metrics.put("height", 1080);
-			metrics.put("deviceScaleFactor", 1);
-			metrics.put("mobile", false);
+	        // ---------- Execute CDP Command only for Chrome/Edge ----------
+	        if (browser.equalsIgnoreCase("chrome") || browser.equalsIgnoreCase("edge")) {
+	            Map<String, Object> metrics = new HashMap<>();
+	            metrics.put("width", 1920);
+	            metrics.put("height", 1080);
+	            metrics.put("deviceScaleFactor", 1);
+	            metrics.put("mobile", false);
+	            metrics.put("credentials_enable_service", false);
+	            metrics.put("profile.password_manager_enabled", false);
+	            metrics.put("profile.password_manager_leak_detection", false);
 
-			((ChromiumDriver) BaseClass.getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
-			
-			ExtendManager.registerDriver(getDriver());
-			logger.info("FireFox driver instance is created");
-		} else if (browser.equalsIgnoreCase("edge")) {
-			
-			
-			//create EdgeOpetions
-			EdgeOptions options = new EdgeOptions(); 
-			options.addArguments("--headless"); //Run Edge in headless mode
-			options.addArguments("--disable-gpu"); //Disable GPU for headless mode
-			options.addArguments("--window-size=1920,1080"); //Set window size
-			options.addArguments("--disable-notifications"); //Disable browser notification
-			options.addArguments("--no-sandbox"); //Required in some Linux enviroments
-			options.addArguments("--disable-dev-shm-usage"); //Resolve issue in resources
-			
-			//driver = new EdgeDriver();
-			driver.set(new EdgeDriver(options));
-			
-			Map<String, Object> metrics = new HashMap<>();
-			metrics.put("width", 1920);
-			metrics.put("height", 1080);
-			metrics.put("deviceScaleFactor", 1);
-			metrics.put("mobile", false);
+	            // Only call CDP if driver implements HasCdp
+	            if (getDriver() instanceof HasCdp) {
+	                ((HasCdp) getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
+	            }
+	        }
 
-			((ChromiumDriver) BaseClass.getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
-			ExtendManager.registerDriver(getDriver());
-			logger.info("Edge driver instance is created");
-		} else {
+	        // Register driver with ExtendManager
+	        ExtendManager.registerDriver(getDriver());
 
-			throw new IllegalArgumentException("Browser not supportes" + browser);
-		}
-
+	    } catch (MalformedURLException e) {
+	        throw new RuntimeException("Invalid Grid URL", e);
+	    }
 	}
 
 	// configure browser settings such as implicit wait, maximize the browser,
