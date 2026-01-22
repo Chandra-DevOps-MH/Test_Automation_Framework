@@ -100,6 +100,20 @@ public class BaseClass {
 	                options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080",
 	                        "--disable-notifications", "--no-sandbox", "--disable-dev-shm-usage", "--incognito");
 	                driver.set(new RemoteWebDriver(new URL(getURL), options));
+	                
+	                Map<String, Object> metrics = new HashMap<>();
+		            metrics.put("width", 1920);
+		            metrics.put("height", 1080);
+		            metrics.put("deviceScaleFactor", 1);
+		            metrics.put("mobile", false);
+		            metrics.put("credentials_enable_service", false);
+		            metrics.put("profile.password_manager_enabled", false);
+		            metrics.put("profile.password_manager_leak_detection", false);
+
+		            // Only call CDP if driver implements HasCdp
+		            if (getDriver() instanceof HasCdp) {
+		                ((HasCdp) getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
+		            }
 
 	            } else if (browser.equalsIgnoreCase("firefox")) {
 	                FirefoxOptions options = new FirefoxOptions();
