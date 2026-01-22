@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        COMPOSE_PATH = "${WORKSPACE}/docker"   // docker-compose.yml location
+        COMPOSE_PATH = "${WORKSPACE}/docker"   // Folder containing docker-compose.yml
         GRID_URL = "http://localhost:4444/wd/hub"
     }
 
@@ -19,12 +19,18 @@ pipeline {
             }
         }
 
+        stage('Check Docker') {
+            steps {
+                bat 'docker version'
+            }
+        }
+
         stage('Start Selenium Grid') {
             steps {
                 dir("${COMPOSE_PATH}") {
                     bat '''
-                    docker-compose down
-                    docker-compose up -d
+                    docker compose down
+                    docker compose up -d
                     '''
                 }
             }
@@ -32,21 +38,31 @@ pipeline {
 
         stage('Wait for Grid') {
             steps {
-                bat 'timeout /t 15'
+                bat '''
+                echo Waiting for Selenium Grid...
+                for /L %%i in (1,1,10) do (
+                    curl -s http://localhost:4444/status && exit /b 0
+                    timeout /t 3 > nul
+                )
+                echo Grid did not start in time
+                exit /b 1
+                '''
             }
         }
 
         stage('Clean & Build') {
             steps {
-                bat 'mvn clean install -DskipTests'
+                dir("${WORKSPACE}") {
+                    bat 'mvn clean install -DskipTests'
+                }
             }
         }
 
         stage('Run Tests') {
             steps {
-                bat '''
-                mvn test -Dgrid.url=%GRID_URL%
-                '''
+                dir("${WORKSPACE}") {
+                    bat 'mvn test -Dgrid.url=%GRID_URL%'
+                }
             }
         }
 
@@ -64,7 +80,7 @@ pipeline {
     post {
         always {
             dir("${COMPOSE_PATH}") {
-                bat 'docker-compose down'
+                bat 'docker compose down'
             }
 
             archiveArtifacts artifacts: '**/src/test/resources/ExtentReport/*.html', fingerprint: true
@@ -78,7 +94,9 @@ pipeline {
                 <p>Hello Team,</p>
                 <p>The Jenkins job <b>${env.JOB_NAME}</b> executed successfully.</p>
                 <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
-                <p><a href="${env.BUILD_URL}">View build details</a></p>
+                <p>
+                    <a href="${env.BUILD_URL}">View build details</a>
+                </p>
                 <p>Regards,<br/>Jenkins Automation</p>
                 """,
                 mimeType: 'text/html',
@@ -92,13 +110,3 @@ pipeline {
                 body: """
                 <p>Hello Team,</p>
                 <p>The Jenkins job <b>${env.JOB_NAME}</b> has <b>FAILED</b>.</p>
-                <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
-                <p><a href="${env.BUILD_URL}">Check logs</a></p>
-                <p>Regards,<br/>Jenkins Automation</p>
-                """,
-                mimeType: 'text/html',
-                to: 'chandrakantghasti99@gmail.com'
-            )
-        }
-    }
-}
