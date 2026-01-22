@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         COMPOSE_PATH = "${WORKSPACE}/docker"   // Folder containing docker-compose.yml
-        GRID_URL = "http://localhost:4444/wd/hub"
+        GRID_URL = "http://localhost:4444"
     }
 
     stages {
