@@ -110,3 +110,15 @@ pipeline {
                 body: """
                 <p>Hello Team,</p>
                 <p>The Jenkins job <b>${env.JOB_NAME}</b> has <b>FAILED</b>.</p>
+                <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
+                <p>
+                    <a href="${env.BUILD_URL}">Check build logs</a>
+                </p>
+                <p>Regards,<br/>Jenkins Automation</p>
+                """,
+                mimeType: 'text/html',
+                to: 'chandrakantghasti99@gmail.com'
+            )
+        }
+    }
+}
