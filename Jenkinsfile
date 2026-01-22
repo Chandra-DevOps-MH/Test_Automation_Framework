@@ -37,18 +37,32 @@ pipeline {
         }
 
         stage('Wait for Grid') {
-            steps {
-                bat '''
-                echo Waiting for Selenium Grid...
-                for /L %%i in (1,1,10) do (
-                    curl -s http://localhost:4444/status && exit /b 0
-                    timeout /t 3 > nul
-                )
-                echo Grid did not start in time
-                exit /b 1
-                '''
+    steps {
+        powershell '''
+        Write-Host "Waiting for Selenium Grid..."
+        $ready = $false
+
+        for ($i=1; $i -le 15; $i++) {
+            try {
+                $resp = Invoke-RestMethod http://localhost:4444/status
+                if ($resp.value.ready -eq $true) {
+                    Write-Host "Selenium Grid is READY"
+                    $ready = $true
+                    break
+                }
+            } catch {
+                Write-Host "Grid not ready yet..."
             }
+            Start-Sleep -Seconds 3
         }
+
+        if (-not $ready) {
+            Write-Error "Selenium Grid did not start in time"
+            exit 1
+        }
+        '''
+    }
+}
 
         stage('Clean & Build') {
             steps {
