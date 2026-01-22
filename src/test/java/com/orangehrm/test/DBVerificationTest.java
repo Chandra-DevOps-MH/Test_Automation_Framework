@@ -57,6 +57,7 @@ public class DBVerificationTest extends BaseClass{
 	
 		
 		String employeeFirstandMiddleName = (empFirstName+" "+empMiddleName).trim();
+		System.out.println(employeeFirstandMiddleName);
 
 		//Verify employee firstname and middlename
 		ExtendManager.logStep("Verify employee firstName and MiddleName");
