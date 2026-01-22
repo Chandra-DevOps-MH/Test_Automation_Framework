@@ -110,10 +110,10 @@ public class BaseClass {
 
 	            } else if (browser.equalsIgnoreCase("edge")) {
 	                EdgeOptions options = new EdgeOptions();
-	                options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080",
-	                        "--disable-notifications", "--no-sandbox", "--disable-dev-shm-usage");
-	                driver.set(new RemoteWebDriver(new URL(getURL), options));
+	                options.addArguments("--headless");
+	                options.addArguments("--window-size=1920,1080");
 
+	                driver.set(new RemoteWebDriver(new URL(getURL), options));
 	            } else {
 	                throw new IllegalArgumentException("Browser not supported for Grid: " + browser);
 	            }
@@ -145,20 +145,17 @@ public class BaseClass {
 	            logger.info("Local WebDriver instance created");
 	        }
 
-	        // ---------- Execute CDP Command only for Chrome/Edge ----------
-	        if (browser.equalsIgnoreCase("chrome") || browser.equalsIgnoreCase("edge")) {
+	     // Execute CDP ONLY for Chrome
+	        if (browser.equalsIgnoreCase("chrome")) {
 	            Map<String, Object> metrics = new HashMap<>();
 	            metrics.put("width", 1920);
 	            metrics.put("height", 1080);
 	            metrics.put("deviceScaleFactor", 1);
 	            metrics.put("mobile", false);
-	            metrics.put("credentials_enable_service", false);
-	            metrics.put("profile.password_manager_enabled", false);
-	            metrics.put("profile.password_manager_leak_detection", false);
 
-	            // Only call CDP if driver implements HasCdp
 	            if (getDriver() instanceof HasCdp) {
-	                ((HasCdp) getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
+	                ((HasCdp) getDriver())
+	                    .executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
 	            }
 	        }
 
