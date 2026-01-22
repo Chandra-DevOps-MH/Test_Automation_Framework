@@ -102,24 +102,75 @@ public class BaseClass {
 			   if(browser.equalsIgnoreCase("chrome"))
 			   {
 				    ChromeOptions options = new ChromeOptions(); 
-				   options.setPlatformName("WINDOWS");
+				   //options.setPlatformName("WINDOWS");
 					options.addArguments("--headless"); //Run Chrome in headless mode
+					options.addArguments("--disable-gpu"); //Disable GPU for headless mode
+					options.addArguments("--window-size=1920,1080"); //Set window size
+					options.addArguments("--disable-notifications"); //Disable browser notification
+					options.addArguments("--no-sandbox"); //Required in some Linux enviroments
+					options.addArguments("--disable-dev-shm-usage"); //Resolve issue in resources
+					options.addArguments("--disable-extensions");
+					options.addArguments("--incognito");
+					
 					
 					driver.set(new RemoteWebDriver(new URL(getURL), options));
+					
+					Map<String, Object> metrics = new HashMap<>();
+					metrics.put("width", 1920);
+					metrics.put("height", 1080);
+					metrics.put("deviceScaleFactor", 1);
+					metrics.put("mobile", false);
+					metrics.put("credentials_enable_service", false);
+					metrics.put("profile.password_manager_enabled", false);
+					metrics.put("profile.password_manager_leak_detection", false);
+
+					((ChromiumDriver) BaseClass.getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
+
 			   }else if(browser.equalsIgnoreCase("firefox"))
 			   {
 				   FirefoxOptions options = new FirefoxOptions(); 
-				   options.setPlatformName("WINDOWS");
+				  // options.setPlatformName("WINDOWS");
 				   options.addArguments("--headless"); //Run Firefox in headless mode
+				   options.addArguments("--disable-gpu"); //Disable GPU for headless mode
+					options.addArguments("--window-size=1920,1080"); //Set window size
+					options.addArguments("--disable-notifications"); //Disable browser notification
+					options.addArguments("--no-sandbox"); //Required in some Linux enviroments
+					options.addArguments("--disable-dev-shm-usage"); //Resolve issue in resources
+					
 				   
 				   driver.set(new RemoteWebDriver(new URL(getURL), options));
+				   
+				   Map<String, Object> metrics = new HashMap<>();
+					metrics.put("width", 1920);
+					metrics.put("height", 1080);
+					metrics.put("deviceScaleFactor", 1);
+					metrics.put("mobile", false);
+
+					((ChromiumDriver) BaseClass.getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
+
+				   
 			   }else if(browser.equalsIgnoreCase("edge"))
 			   {
 				   EdgeOptions options = new EdgeOptions(); 
-				   options.setPlatformName("WINDOWS");
+				  // options.setPlatformName("WINDOWS");
 				   options.addArguments("--headless"); //Run Edge in headless mode
+				   options.addArguments("--disable-gpu"); //Disable GPU for headless mode
+					options.addArguments("--window-size=1920,1080"); //Set window size
+					options.addArguments("--disable-notifications"); //Disable browser notification
+					options.addArguments("--no-sandbox"); //Required in some Linux enviroments
+					options.addArguments("--disable-dev-shm-usage"); //Resolve issue in resources
+					
 				   
 				   driver.set(new RemoteWebDriver(new URL(getURL), options));
+				   
+				   Map<String, Object> metrics = new HashMap<>();
+					metrics.put("width", 1920);
+					metrics.put("height", 1080);
+					metrics.put("deviceScaleFactor", 1);
+					metrics.put("mobile", false);
+
+					((ChromiumDriver) BaseClass.getDriver()).executeCdpCommand("Emulation.setDeviceMetricsOverride", metrics);
+
 
 			   }else
 			   {
@@ -134,7 +185,7 @@ public class BaseClass {
 		
 		
 		
-		if (browser.equalsIgnoreCase("chrome")) {
+		else if(browser.equalsIgnoreCase("chrome")) {
 			
 			//create ChromeOptions
 			ChromeOptions options = new ChromeOptions(); 
@@ -224,18 +275,27 @@ public class BaseClass {
 	private void configureBrowser() {
 		// Implicit wait
 		int implicitwait = Integer.parseInt(prop.getProperty("implicitWait"));
-	    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitwait));
+		boolean seleniumGrid = Boolean.parseBoolean(prop.getProperty("seleniumGrid"));
+		getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitwait));
+	    
 
 		// Maximize the browser
 	    getDriver().manage().window().maximize();
 
-		// Navigate to URL
-		try {
-			getDriver().get(prop.getProperty("url"));
-		} catch (Exception e) {
-
-			System.out.println("Failed to navigate to the URL" + e.getMessage());
-		}
+		/*
+		 * // Navigate to URL try { getDriver().get(prop.getProperty("url")); } catch
+		 * (Exception e) {
+		 * 
+		 * System.out.println("Failed to navigate to the URL" + e.getMessage()); }
+		 */
+	    
+	    if(seleniumGrid)
+	    {
+	    	getDriver().get(prop.getProperty("url_grid"));
+	    }else {
+	    	getDriver().get(prop.getProperty("url_local"));
+	 	   
+	    }
 	}
 
 	@AfterMethod
